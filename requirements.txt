@@ -2,3 +2,7 @@ numpy
 scipy
 opencv-python
 matplotlib
+pytest
+coverage
+flake8
+pytest-cov
