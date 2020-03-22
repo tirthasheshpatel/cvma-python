@@ -1,6 +1,8 @@
 language: python
 
 jobs:
+  allow_failures:
+    - os: osx
   include:
     - name: "Python 3.6 on Xenial Linux"
       python: 3.6
@@ -13,7 +15,6 @@ jobs:
       env: TOXENV=py3
       addons:
         homebrew:
-          update: true
           packages: python3
       before_install:
         - pip3 install virtualenv
