@@ -5,17 +5,20 @@ jobs:
     - name: "Python 3.6 on Xenial Linux"
       python: 3.6
     - name: "Python 3.7 on Xenial Linux"
-      python: 3.6
-    - name: "Python 3.6 on macOS"
-      os: osx
-      osx_image: xcode11.2
-      language: shell
-      python: 3.6
-    - name: "Python 3.7 on macOS"
-      os: osx
-      osx_image: xcode11.2
-      language: shell
       python: 3.7
+    - name: "Python 3.8 on MacOSX"
+      stage: test
+      os: osx
+      language: sh
+      env: TOXENV=py3
+      addons:
+        homebrew:
+          update: true
+          packages: python3
+      before_install:
+        - pip3 install virtualenv
+        - virtualenv -p python3 ~/venv
+        - source ~/venv/bin/activate
 
 install:
   - pip install --upgrade pip
