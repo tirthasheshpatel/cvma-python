@@ -24,5 +24,7 @@ after_success:
   - codecov
   - bash <(curl -s https://codecov.io/bash)
   - flake8 --max-line-length 100
+  - python -m pylint cvma/ tests/
+  - python -m black --check cvma/ tests/
 
 notification: false
