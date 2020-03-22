@@ -37,9 +37,11 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: pytest
       run: |
+        pip install pytest-cov
         pytest tests --cov cvma
     - name: pylint
       run: |
+        pip install pylint
         python -m pylint cvma/ tests/
     - name: poetry (experimental => doesn't have to pass)
       uses: abatilo/actions-poetry@v1.0.0
