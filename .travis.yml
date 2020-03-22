@@ -1,0 +1,28 @@
+sudo: false
+
+language:
+  - python 3.6
+  - python 3.7
+  - python 3.8
+ 
+ install:
+  - pip install numpy
+  - pip install opencv-python
+  - pip install scipy
+  - pip install matplotlib
+  - pip install flake8
+  - pip install pytest-cov
+  - pip install coverage
+ 
+ script:
+  - pytest --cov='./'
+  
+ env:
+  - PYTHONPATH=$PWD
+  
+after_success:
+  - codecov
+  - bash <(curl -s https://codecov.io/bash)
+  - flake8 --max-line-length 100
+
+notification: false
