@@ -1,23 +1,26 @@
-sudo: false
+language: python
 
-language:
-  - python 3.7
-  - python 3.8
+jobs:
+  include:
+    - name: "Python 3.6 and 3.7 on Xenial Linux"
+      python:
+        - "3.6"
+        - "3.7"
+    - name: "Python 3.7.4 on macOS"
+      os: osx
+      osx_image: xcode11.2  # Python 3.7.4 running on macOS 10.14.4
+      language: shell       # 'language: python' is an error on Travis CI macOS
+    - name: "Python 3.8.0 on Windows"
+      os: windows           # Windows 10.0.17134 N/A Build 17134
+      language: shell       # 'language: python' is an error on Travis CI Windows
+      before_install:
+        - choco install python --version 3.7.6
+        - python -m pip install --upgrade pip
 
-install:
-  - pip install numpy
-  - pip install opencv-python
-  - pip install scipy
-  - pip install matplotlib
-  - pip install flake8
-  - pip install pytest-cov
-  - pip install coverage
+install: pip3 install --upgrade pip
 
 script:
   - pytest --cov cvma
-
-env:
-  - PYTHONPATH=$PWD
 
 after_success:
   - codecov
