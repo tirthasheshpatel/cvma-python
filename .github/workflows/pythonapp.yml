@@ -35,10 +35,6 @@ jobs:
       run: |
         pip install pytest
         pytest
-    - name: Cache
-      uses: actions/cache@v1.1.2
-      with:
-        # A directory to store and save the cache
-        path: ~/.tcache
-        # An explicit key for restoring and saving the cache
-        key: ${{ runner.os }}-build-${{ env.cache-name }}
+    - name: Python Poetry Action
+      uses: abatilo/actions-poetry@v1.0.0
+    
