@@ -5,8 +5,11 @@ intrinsic and extrinsic parameters. If some parameters are not
 available, you can make them variable and change them during the
 calibration process.
 """
-
+import warnings
 import numpy as np
+from ..utils import to_homogeneous
+
+__all__ = ["Camera", "get_rotation_matrix"]
 
 def get_rotation_matrix(rotation_angles):
     """Get the rotation matrix from euler's angles
@@ -90,6 +93,7 @@ class Camera(object):
         "_x0", "_y0",
         "_theta",
         "_r1", "_r2", "_r3",
+        "__rotation_matrix",
         "__rotation_angles",
         "_t1", "_t2", "_t3",
         "_calibration_matrix",
@@ -117,15 +121,19 @@ class Camera(object):
             self.__rotation_angles = rotation_angles
         else:
             raise AttributeError("no attribute explaining rotation to translate to the camera co-ordinate frame from the world co-ordinate frame.")
-        self._r1 = rotation_matrix[0, :].reshape(-1, 1)
-        self._r2 = rotation_matrix[1, :].reshape(-1, 1)
-        self._r3 = rotation_matrix[2, :].reshape(-1, 1)
+        self._r1 = rotation_matrix[0, :]
+        self._r2 = rotation_matrix[1, :]
+        self._r3 = rotation_matrix[2, :]
+        self.__rotation_matrix = rotation_matrix
         if translation_vector is None:
             translation_vector = np.zeros(3)
         translation_vector = np.asarray(translation_vector).reshape(-1,)
         self._t1 = translation_vector[0]
         self._t2 = translation_vector[1]
         self._t3 = translation_vector[2]
+
+        self._calibration_matrix = None
+        self._perspective_projection_matrix = None
     
     def get_calibration_matrix(self):
         """Get the calibration matrix of the camera
@@ -134,8 +142,8 @@ class Camera(object):
         -----
         Calibration matrix of the camera
         """
-        if self._calibration_matrix is not None:
-            return self._calibration_matrix
+        # if self._calibration_matrix is not None:
+        #     return self._calibration_matrix
         return self._build_calibration_matrix()
     
     def get_perspective_projection_matrix(self):
@@ -145,11 +153,11 @@ class Camera(object):
         -----
         Perspective projection matrix
         """
-        if self._perspective_projection_matrix is not None:
-            return self._perspective_projection_matrix
+        # if self._perspective_projection_matrix is not None:
+        #     return self._perspective_projection_matrix
         return self._build_perspective_projection_matrix()
 
-    def _project(self, w_point):
+    def _project(self, w_point_homogeneous, expected_shape):
         if self._perspective_projection_matrix is None:
             self._build_perspective_projection_matrix()
 
@@ -157,7 +165,68 @@ class Camera(object):
         m2 = self._perspective_projection_matrix[1, :]
         m3 = self._perspective_projection_matrix[2, :]
 
-        x = np.inner(m1, w_point) / np.inner(m3, w_point)
-        y = np.inner(m2, w_point) / np.inner(m3, w_point)
+        x = np.inner(m1, w_point_homogeneous) / np.inner(m3, w_point_homogeneous)
+        y = np.inner(m2, w_point_homogeneous) / np.inner(m3, w_point_homogeneous)
 
-        return np.array([x, y]).reshape(*w_point.shape)
+        return np.array([x, y]).reshape(*expected_shape)
+
+    def _build_calibration_matrix(self, use_cached=True):
+        if self._calibration_matrix is not None and use_cached == True:
+            warnings.warn(
+                "using the cached matrix. use `use_cached=False` to recalculate the matrix",
+                RuntimeWarning
+            )
+            return self._calibration_matrix
+        self._calibration_matrix = np.array([
+            [self._alpha, -self._alpha*np.cos(self._theta)/np.sin(self._theta), self._x0],
+            [          0,                       self._beta/np.sin(self._theta), self._y0],
+            [          0,                                                    0,        1]
+        ])
+        return self._calibration_matrix
+
+    def _build_perspective_projection_matrix(self, use_cached=True):
+        if self._perspective_projection_matrix is not None and use_cached == True:
+            warnings.warn(
+                "using the cached matrix. use `use_cached=False` to recalculate the matrix",
+                RuntimeWarning
+            )
+            return self._perspective_projection_matrix
+        self._perspective_projection_matrix = np.array([
+            [
+                *(self._alpha*self._r1-self._alpha*np.cos(self._theta)/np.sin(self._theta)*self._r2+self._x0*self._r3),
+                self._alpha*self._t1-self._alpha*np.cos(self._theta)/np.sin(self._theta)*self._t2+self._x0*self._t3
+            ],
+            [
+                *(self._beta/np.sin(self._theta)*self._r2+self._y0*self._r3),
+                self._beta/np.sin(self._theta)*self._t2+self._y0*self._t3
+            ],
+            [*self._r3, self._t3],
+        ])
+        return self._perspective_projection_matrix
+
+    def project(self, w_point):
+        """Project a point from the world co-ordinate system
+        to the caesra's co-ordinate system
+
+        Paramters
+        -----
+        w_point: array-like of shape (3, )
+            A three dimentional point the world co-ordinates
+        
+        Returns
+        -----
+        A point in the camera's co-ordinate frame
+        """
+        w_point = np.asarray(w_point)
+        expected_shape = (2,)
+        if len(w_point.shape) == 1:
+            expected_shape = (2,)
+        elif w_point.shape[0] == 1:
+            expected_shape = (1, 2)
+        elif w_point.shape[1] == 1:
+            expected_shape = (2, 1)
+
+        w_point_homogeneous = to_homogeneous(w_point)
+        projected_point = self._project(w_point_homogeneous, expected_shape)
+
+        return projected_point
