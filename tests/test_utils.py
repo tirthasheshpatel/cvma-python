@@ -11,18 +11,19 @@ import pytest
 
 
 @pytest.mark.parametrize(
-    "data, matrix_aux_entries",
+    "data, matrix_aux_entries, expected",
     [
-        (np.array([1, 2]), None),
-        (np.array([[1.0, 2.0]]), None),
-        (np.array([[1.0], [2.0]]), None),
-        (np.array([[1.0, 2.0], [3.0, 4.0]]), None),
-        (np.array([[1.0, 2.0], [3.0, 4.0]]), [20.0, 1.0]),
+        (np.array([1, 2]), None, np.array([1, 2, 1])),
+        (np.array([[1.0, 2.0]]), None, np.array([[1., 2., 1.]])),
+        (np.array([[1.0], [2.0]]), None, np.array([[1.], [2.], [1.]])),
+        (np.array([[1.0, 2.0], [3.0, 4.0]]), None, np.array([[1., 2., 0.], [3., 4., 0.], [0., 0., 1.]])),
+        (np.array([[1.0, 2.0], [3.0, 4.0]]), [20.0, 1.0], np.array([[1., 2., 20.], [3., 4., 1.], [0., 0., 1.]])),
     ],
 )
-def test_to_homogeneous(data, matrix_aux_entries):
+def test_to_homogeneous(data, matrix_aux_entries, expected):
     res = to_homogeneous(data, matrix_aux_entries)
     assert res.dtype == data.dtype
+    assert np.all(res == expected)
 
 
 def test_to_homogeneous_bad_input():

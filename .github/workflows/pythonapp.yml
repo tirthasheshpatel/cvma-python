@@ -45,7 +45,3 @@ jobs:
         python -m pylint cvma/ tests/
     - name: poetry (experimental => doesn't have to pass)
       uses: abatilo/actions-poetry@v1.0.0
-    - name: black
-      run: |
-        pip install black
-        python -m black --check cvma/ tests/
