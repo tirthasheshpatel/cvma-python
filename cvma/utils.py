@@ -1,10 +1,17 @@
+"""Utilities for CVMA module
+
+This module contains the common helper functions often encountered while doing
+Computer Vision.
+
+"""
+
 import numpy as np
 
 __all__ = ["to_homogeneous"]
 
 
 def to_homogeneous(data, matrix_auxilary_entries=None):
-    """Convert a vector or matrix to its homogeneous form
+    r"""Convert a vector or matrix to its homogeneous form.
 
     Converts a vector [x1, x2, ..., xn] to [x1, x2, ..., xn, 1]
     Converts a matrix
@@ -21,7 +28,7 @@ def to_homogeneous(data, matrix_auxilary_entries=None):
     where matrix_auxilary_entries = [aux1, aux2, ..., auxm]
 
     Parameters
-    -----
+    ----------
     data: array-like of shape (m, ) or (m, n)
         The vector or matrix to be converted into its homogeneous form
     
@@ -29,10 +36,24 @@ def to_homogeneous(data, matrix_auxilary_entries=None):
         The auxilary entries of the last column of transformed matrix
     
     Returns
-    -----
+    -------
     Transformed vector or matrix to its homogeneous form
 
-    Note
+    Examples
+    --------
+    >>> import cvma.utils
+    >>> import numpy as np
+    >>> v = [0., 0.]
+    >>> cvma.utils.to_homogeneous(v)
+    array([0., 0., 1.])
+    >>> rotation_matrix = np.array([[1., 0.], [0., 1.]])
+    >>> transition_vector = np.array([2., 1.])
+    >>> transformation_matrix = cvma.utils.to_homogeneous(rotation_matrix, transition_vector)
+    array([[1., 0., 2.],
+           [0., 1., 1.],
+           [0., 0., 1.]])
+
+    Notes
     -----
     Arrays of shape (m, ), (m, 1), and (1, m) are considered equivalent.
     Note also that the dtype of data is only considered during transformation
