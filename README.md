@@ -1,6 +1,10 @@
 # cvma-python
 [![Build Status](https://travis-ci.com/tirthasheshpatel/cvma-python.svg?branch=master)](https://travis-ci.com/tirthasheshpatel/cvma-python)
 [![codecov](https://codecov.io/gh/tirthasheshpatel/cvma-python/branch/master/graph/badge.svg)](https://codecov.io/gh/tirthasheshpatel/cvma-python)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/tirthasheshpatel/cvma-python.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/tirthasheshpatel/cvma-python/alerts/)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/tirthasheshpatel/cvma-python.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/tirthasheshpatel/cvma-python/context:python)
+![Python Versions Supported: 3.6 | 3.7 | 3.8](https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8-yellowgreen)
+
 
 Computer Vision: A Modern Approach Algorithm Implementation in Python
 
